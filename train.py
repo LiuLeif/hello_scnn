@@ -11,6 +11,8 @@ from dataset import Tusimple
 from scnn_vgg import SCNNVgg
 from scnn_mobilenet import SCNNMobileNet
 
+from torchmetrics import F1Score
+
 device = torch.device("cuda:0")
 
 
@@ -32,6 +34,7 @@ def evaluate(args):
 
     progress = tqdm(range(len(test_loader)))
     total_loss = 0.0
+    f1score = F1Score(num_classes=5, average="none", mdmc_reduce="global").to(device)
     for idx, sample in enumerate(test_loader):
         img = sample["img"].to(device)
         label = sample["label"].to(device)
@@ -39,8 +42,11 @@ def evaluate(args):
         seg_pred, exist_pred, loss = net(img, label, exist)
         progress.set_description(f"loss: {loss.item():.3f}")
         progress.update(1)
+        f1score.update(seg_pred, label)
         total_loss += loss.item()
-    progress.set_description(f"mean loss: {total_loss/len(test_loader):.3f}")
+    progress.set_description(
+        f"mean loss: {total_loss/len(test_loader):.3f},f1score: {f1score.compute()}"
+    )
 
 
 def train(args):
@@ -130,5 +136,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", choices=["vgg", "mobilenet"], default="mobilenet")
     args = parser.parse_args()
 
-    train(args)
+    if args.epoch != 0:
+        train(args)
+
     evaluate(args)
