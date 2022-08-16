@@ -14,7 +14,7 @@ DATA_PATH = "/data/datasets/tusimple"
 
 MIN_PROB = 4
 
-EPOCH = 5
+EPOCH = 10
 BATCH = 32
 LR = 1e-3
 MAX_LR = 3e-1

@@ -6,7 +6,7 @@ credit to https://github.com/harryhan618/SCNN_Pytorch
 
 # train
 
-./train.py –reset
+./train.py
 
 # inference
 
