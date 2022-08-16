@@ -85,18 +85,25 @@ def inference_image(args, detector, image):
             lane_img[(x, y)] = color[i - 1]
 
     if args.vis == "fill":
-        left_y, left_x = np.where(np.logical_and(coord_mask == 2, prob > config.MIN_PROB))
+        left_y, left_x = np.where(
+            np.logical_and(coord_mask == 2, prob > config.MIN_PROB)
+        )
         # left_y, left_x = np.where(coord_mask == 2)
-        right_y, right_x = np.where(np.logical_and(coord_mask == 3, prob > config.MIN_PROB))
+        right_y, right_x = np.where(
+            np.logical_and(coord_mask == 3, prob > config.MIN_PROB)
+        )
         # right_y, right_x = np.where(coord_mask == 3)
-        if len(left_x) >= 50 and len(right_x) >= 50:
-            left_poly = np.polyfit(left_x, left_y, deg=3)
-            right_poly = np.polyfit(right_x, right_y, deg=3)
-            left_y = np.poly1d(left_poly)(left_x).astype(np.int32)
-            right_y = np.poly1d(right_poly)(right_x).astype(np.int32)
+        if len(left_x) >= 10 and len(right_x) >= 10:
+            left_poly = np.polyfit(left_y, left_x, deg=1)
+            right_poly = np.polyfit(right_y, right_x, deg=1)
+            y = np.linspace(
+                np.min(np.concatenate([left_y, right_y])), config.IMAGE_H
+            ).astype(np.int32)
+            left_x = np.poly1d(left_poly)(y).astype(np.int32)
+            right_x = np.poly1d(right_poly)(y).astype(np.int32)
 
-            left_points = np.array([[[xi, yi]] for xi, yi in zip(left_x, left_y)])
-            right_points = np.array([[[xi, yi]] for xi, yi in zip(right_x, right_y)])
+            left_points = np.array([[[xi, yi]] for xi, yi in zip(left_x, y)])
+            right_points = np.array([[[xi, yi]] for xi, yi in zip(right_x, y)])
             points = np.concatenate((left_points, np.flip(right_points, 0)))
             cv2.fillPoly(lane_img, [points], color=[0, 255, 0])
 

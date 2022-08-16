@@ -12,7 +12,7 @@ SEG_WIDTH = 30
 
 DATA_PATH = "/data/datasets/tusimple"
 
-MIN_PROB = 6
+MIN_PROB = 4
 
 EPOCH = 5
 BATCH = 32

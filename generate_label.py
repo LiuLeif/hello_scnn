@@ -16,7 +16,12 @@ def generate_label(flist, mode):
     output = []
     for x in flist:
         x = os.path.join(config.DATA_PATH, x)
-
+        # NOTE: opencv 的坐标轴是
+        #  +------>x
+        #  |
+        #  |
+        #  v
+        #  y
         with open(x) as f:
             print(x)
             lines = f.readlines()
