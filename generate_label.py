@@ -12,7 +12,7 @@ import shutil
 from tqdm import tqdm
 
 
-def generate_label(flist, mode):
+def generate_label_tusimple(flist, mode):
     output = []
     for x in flist:
         x = os.path.join(config.DATA_PATH, x)
@@ -94,17 +94,53 @@ def generate_label(flist, mode):
         pickle.dump(output, f)
 
 
+
+def generate_label_culane(flist, mode):
+    output = []
+
+    for x in flist:
+        x = os.path.join(config.LABEL_DATA_PATH_CULANE, x)
+
+        with open(x) as f:
+            print(x)
+            lines = f.readlines()
+            for line in tqdm(lines):
+                #label = json.loads(line)
+                print(line)
+                exist =  []
+                if len(line) < 10:
+                    continue
+                x = line.split(" ")
+
+                image = x[0]
+                label_image_file = x[1]
+                exist.append(int(x[2]))
+                exist.append(int(x[3]))
+                exist.append(int(x[4]))
+                exist.append(int(x[5][0]))
+
+                output.append((image, label_image_file, exist))     #一张图片，对应一张label image file，对应4条线的识别结果
+                print([image, label_image_file, exist])
+
+    with open(os.path.join(config.LABEL_DATA_PATH_CULANE, f"{mode}.dat"), "wb") as f:     #处理后的上述数据，都写入/data/datasets/CULane/train.dat文件
+        pickle.dump(output, f)
+
 if __name__ == "__main__":
     label_image_dir = os.path.join("label", "clips")
     shutil.rmtree(label_image_dir, ignore_errors=True)
     os.makedirs(label_image_dir, exist_ok=True)
 
-    generate_label(
+    generate_label_culane(
+        ("train.txt",),
+        "train",
+    )
+
+    generate_label_tusimple(
         ("label_data_0313.json", "label_data_0531.json", "label_data_0601.json"),
         "train",
     )
 
-    generate_label(
+    generate_label_tusimple(
         ("test_label.json",),
         "test",
     )

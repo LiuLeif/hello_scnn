@@ -11,6 +11,7 @@ ORIG_IMAGE_W = 1280
 SEG_WIDTH = 30
 
 DATA_PATH = "/data/datasets/tusimple"
+LABEL_DATA_PATH_CULANE = "/data/datasets/CULane"
 
 MIN_PROB = 4
 
