@@ -14,21 +14,23 @@ from scnn_vgg import SCNNVgg
 from scnn_mobilenet import SCNNMobileNet
 import wandb
 from torchmetrics import F1Score, MeanMetric
+import os
 
 device = torch.device("cuda:0")
 
 
 def train():
     if args.dataset == "tusimple_culane":
-	    train_dataset_tusimple = Tusimple("train")
+        train_dataset_tusimple = Tusimple("train")
         train_dataset_culane = Culane("train")
-		train_dataset = ConcatDataset([train_dataset_tusimple, train_dataset_culane])
+        train_dataset = ConcatDataset([train_dataset_tusimple, train_dataset_culane])
 
     if args.dataset == "tusimple":
-	    train_dataset = Tusimple("train")
+        train_dataset = Tusimple("train")
+
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     test_dataset = Tusimple("test")
-	test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
 
     net = None
     if args.model == "vgg":
@@ -152,9 +154,14 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", choices=["tusimple_culane", "tusimple"], default="tusimple_culane")
     args = parser.parse_args()
 
+    os.environ["WANDB_API_KEY"] = 'da38805d8063e9da2c6d8540cc3ed8827f98b0e2'
+    os.environ["WANDB_MODE"] = "offline"
+
     wandb.init(
-        project="scnn",
-        entity="sunway",
+        # project="scnn",
+        # entity="sunway",
+        project="hello_code",
+        entity="leif-liu",
     )
     wandb.config.update(args)
 
