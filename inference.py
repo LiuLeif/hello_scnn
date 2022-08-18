@@ -17,17 +17,18 @@ from scnn_mobilenet import SCNNMobileNet
 
 import util
 import config
+import sweep
 
 fps_counter = []
 fps_counter_N = 5
 
 
 class TorchDetector(object):
-    def __init__(self, model):
+    def __init__(self, args):
         if args.model == "vgg":
-            self.net = SCNNVgg(pretrained=True)
+            self.net = SCNNVgg(args, pretrained=True)
         if args.model == "mobilenet":
-            self.net = SCNNMobileNet(pretrained=True)
+            self.net = SCNNMobileNet(args, pretrained=True)
         save_dict = torch.load(self.net.get_model_name())
         self.net.load_state_dict(save_dict["net"])
         self.net.eval()
@@ -131,10 +132,8 @@ def inference_image(args, detector, image):
 def inference(args):
     print(f"using {args.model}")
     detector = None
-    if args.model == "vgg":
-        detector = TorchDetector("vgg")
-    if args.model == "mobilenet":
-        detector = TorchDetector("mobilenet")
+    if args.model == "vgg" or args.model == "mobilenet":
+        detector = TorchDetector(args)
     if args.model == "onnx":
         detector = OnnxDetector("hello_scnn.onnx")
 
@@ -185,5 +184,6 @@ if __name__ == "__main__":
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--image", type=str)
     source.add_argument("--video", type=str)
+    sweep.apply_model_config(parser)
     args = parser.parse_args()
     inference(args)

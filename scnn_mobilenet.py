@@ -48,7 +48,7 @@ class SCNNMobileNet(SCNN):
 
         # ----------------- SCNN part -----------------
         self.layer2 = nn.Sequential(
-            nn.Dropout2d(0.1), nn.Conv2d(8, 5, 1)  # get (nB, 5, 36, 100)
+            nn.Dropout2d(self.args.dropout), nn.Conv2d(8, 5, 1)  # get (nB, 5, 36, 100)
         )
 
         self.layer3 = nn.Sequential(

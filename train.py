@@ -8,35 +8,36 @@ import argparse
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import ConcatDataset
 from tqdm import tqdm
-from dataset import Tusimple
+from dataset_tusimple import Tusimple
 from dataset_culane import Culane
 from scnn_vgg import SCNNVgg
 from scnn_mobilenet import SCNNMobileNet
 import wandb
 from torchmetrics import F1Score, MeanMetric
 import os
+import sweep
 
 device = torch.device("cuda:0")
 
 
 def train():
     if args.dataset == "tusimple_culane":
-        train_dataset_tusimple = Tusimple("train")
-        train_dataset_culane = Culane("train")
+        train_dataset_tusimple = Tusimple(args, "train")
+        train_dataset_culane = Culane(args, "train")
         train_dataset = ConcatDataset([train_dataset_tusimple, train_dataset_culane])
 
     if args.dataset == "tusimple":
-        train_dataset = Tusimple("train")
+        train_dataset = Tusimple(args, "train")
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-    test_dataset = Tusimple("test")
+    test_dataset = Tusimple(args, "test")
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
 
     net = None
     if args.model == "vgg":
-        net = SCNNVgg(pretrained=True)
+        net = SCNNVgg(args, pretrained=True)
     if args.model == "mobilenet":
-        net = SCNNMobileNet(pretrained=True)
+        net = SCNNMobileNet(args, pretrained=True)
 
     net = net.to(device)
     net.train()
@@ -46,7 +47,7 @@ def train():
 
     lr_scheduler = optim.lr_scheduler.OneCycleLR(
         optimizer,
-        max_lr=config.MAX_LR,
+        max_lr=args.max_learning_rate,
         total_steps=args.epoch * len(train_loader),
     )
 
@@ -131,32 +132,9 @@ def train():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--epoch",
-        type=int,
-        default=config.EPOCH,
-    )
-    parser.add_argument(
-        "--batch_size",
-        type=int,
-        default=config.BATCH,
-    )
-    parser.add_argument(
-        "--learning_rate",
-        type=float,
-        default=config.LR,
-    )
-    parser.add_argument(
-        "--resume",
-        action="store_true",
-    )
-    parser.add_argument("--model", choices=["vgg", "mobilenet"], default="mobilenet")
-    parser.add_argument("--dataset", choices=["tusimple_culane", "tusimple"], default="tusimple_culane")
+    sweep.apply_training_config(parser)
+    sweep.apply_model_config(parser)
     args = parser.parse_args()
-
-    # os.environ["WANDB_API_KEY"] = 'da38805d8063e9da2c6d8540cc3ed8827f98b0e2'
-    # os.environ["WANDB_MODE"] = "offline"
-
     wandb.init(
         project="scnn",
         entity="sunway",

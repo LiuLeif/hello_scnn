@@ -5,24 +5,25 @@ import torch
 import argparse
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from dataset import Tusimple
+from dataset_tusimple import Tusimple
 from scnn_vgg import SCNNVgg
 from scnn_mobilenet import SCNNMobileNet
 from torchmetrics import F1Score
+import sweep
 
 device = torch.device("cuda:0")
 
 
-def evaluate(args):
+def evaluate():
     print("evaluating")
-    test_dataset = Tusimple("test")
+    test_dataset = Tusimple(args, "test")
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 
     net = None
     if args.model == "vgg":
-        net = SCNNVgg(pretrained=True)
+        net = SCNNVgg(args, pretrained=True)
     if args.model == "mobilenet":
-        net = SCNNMobileNet(pretrained=True)
+        net = SCNNMobileNet(args, pretrained=True)
 
     net = net.to(device)
     net.eval()
@@ -51,6 +52,7 @@ def evaluate(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", choices=["vgg", "mobilenet"], default="mobilenet")
+    sweep.apply_model_config(parser)
     args = parser.parse_args()
 
-    evaluate(args)
+    evaluate()

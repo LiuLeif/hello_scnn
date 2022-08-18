@@ -17,12 +17,12 @@ from data_augment import flip
 
 
 class Tusimple(Dataset):
-    def __init__(self, mode):
+    def __init__(self, args, mode):
         super(Tusimple, self).__init__()
+        self.args = args
         self.mode = mode
         self.load_data()
-        self.cache = {}
-
+        
     def load_data(self):
         label_file = os.path.join("label", "{}.dat".format(self.mode))
         with open(label_file, "rb") as f:
@@ -30,6 +30,7 @@ class Tusimple(Dataset):
 
     def __len__(self):
         return len(self.label_data)
+        # return 32 * 32
 
     def __getitem__(self, idx):
         label_data = self.label_data[idx]
@@ -39,25 +40,19 @@ class Tusimple(Dataset):
         exist = label_data[2]
         exist = torch.from_numpy(np.array(exist)).type(torch.float32)
 
-        img = self.cache.get(image_file)
-        if img is None:
-            img = cv2.imread(image_file)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            img = util.normalize(
-                util.to_tensor(util.resize(img, (config.IMAGE_W, config.IMAGE_H))),
-                config.MEAN,
-                config.STD,
-            )
-            self.cache[image_file] = img
+        img = cv2.imread(image_file)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = util.normalize(
+            util.to_tensor(util.resize(img, (config.IMAGE_W, config.IMAGE_H))),
+            config.MEAN,
+            config.STD,
+        )
 
-        label = self.cache.get(label_file)
-        if label is None:
-            label = cv2.imread(label_file)
-            label = label[:, :, 0]
-            label = util.resize(label, (config.IMAGE_W, config.IMAGE_H))
-            label = torch.from_numpy(label).type(torch.long)
-            self.cache[label_file] = label
-
+        label = cv2.imread(label_file)
+        label = label[:, :, 0]
+        label = util.resize(label, (config.IMAGE_W, config.IMAGE_H))
+        label = torch.from_numpy(label).type(torch.long)
+            
         sample = {
             "img": img,
             "label": label,
@@ -65,7 +60,9 @@ class Tusimple(Dataset):
         }
         if self.mode == "test":
             return sample
-        return (sample, flip(sample))
+        if self.args.augment == "true":
+            return (sample, flip(sample))
+        return (sample,)
 
 
 if __name__ == "__main__":

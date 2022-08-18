@@ -23,13 +23,14 @@ import config
 class SCNN(nn.Module):
     # NOTE: K 是 message_passing 的 kernel 的大小, 必须为奇数, 才能保证 conv 后
     # 尺寸不变
-    def __init__(self, K=9, pretrained=True):
+    def __init__(self, args, pretrained=True):
         super(SCNN, self).__init__()
         self.pretrained = pretrained
-        self.net_init(K)
+        self.args = args
+        self.net_init(args.k)
 
-        self.scale_background = 0.4
-        self.scale_seg = 1.0
+        self.scale_background = args.scale_background
+        self.scale_seg = args.scale_seg
         self.scale_exist = 0.1
 
         self.ce_loss = nn.CrossEntropyLoss(
@@ -72,7 +73,11 @@ class SCNN(nn.Module):
         # see https://arxiv.org/pdf/1712.06080.pdf page 3
         Vertical = [True, True, False, False]
         Reverse = [False, True, False, True]
-        for ms_conv, v, r in zip(self.message_passing, Vertical, Reverse):
+        for ms_conv, v, r in zip(
+            self.message_passing[: self.args.n_message_passing],
+            Vertical[: self.args.n_message_passing],
+            Reverse[: self.args.n_message_passing],
+        ):
             x = self.message_passing_once(x, ms_conv, v, r)
         return x
 

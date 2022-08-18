@@ -23,7 +23,6 @@ def generate_label_tusimple(flist, mode):
         #  v
         #  y
         with open(x) as f:
-            print(x)
             lines = f.readlines()
             for line in tqdm(lines):
                 label = json.loads(line)
@@ -94,7 +93,6 @@ def generate_label_tusimple(flist, mode):
         pickle.dump(output, f)
 
 
-
 def generate_label_culane(flist, mode):
     output = []
 
@@ -102,12 +100,10 @@ def generate_label_culane(flist, mode):
         x = os.path.join(config.LABEL_DATA_PATH_CULANE, x)
 
         with open(x) as f:
-            print(x)
             lines = f.readlines()
             for line in tqdm(lines):
-                #label = json.loads(line)
-                print(line)
-                exist =  []
+                # label = json.loads(line)
+                exist = []
                 if len(line) < 10:
                     continue
                 x = line.split(" ")
@@ -119,11 +115,11 @@ def generate_label_culane(flist, mode):
                 exist.append(int(x[4]))
                 exist.append(int(x[5][0]))
 
-                output.append((image, label_image_file, exist))     #一张图片，对应一张label image file，对应4条线的识别结果
-                print([image, label_image_file, exist])
+                output.append((image, label_image_file, exist))
 
-    with open(os.path.join(config.LABEL_DATA_PATH_CULANE, f"{mode}.dat"), "wb") as f:     #处理后的上述数据，都写入/data/datasets/CULane/train.dat文件
+    with open(os.path.join("label", f"culane_{mode}.dat"), "wb") as f:
         pickle.dump(output, f)
+
 
 if __name__ == "__main__":
     label_image_dir = os.path.join("label", "clips")
