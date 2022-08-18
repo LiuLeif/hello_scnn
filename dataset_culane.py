@@ -30,7 +30,8 @@ class Culane(Dataset):
             self.label_data = pickle.load(f)
 
     def __len__(self):
-        return len(self.label_data)
+        # return len(self.label_data)
+        return 6000
 
     def __getitem__(self, idx):
         label_data = self.label_data[idx]

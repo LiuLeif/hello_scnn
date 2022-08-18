@@ -154,14 +154,14 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", choices=["tusimple_culane", "tusimple"], default="tusimple_culane")
     args = parser.parse_args()
 
-    os.environ["WANDB_API_KEY"] = 'da38805d8063e9da2c6d8540cc3ed8827f98b0e2'
-    os.environ["WANDB_MODE"] = "offline"
+    # os.environ["WANDB_API_KEY"] = 'da38805d8063e9da2c6d8540cc3ed8827f98b0e2'
+    # os.environ["WANDB_MODE"] = "offline"
 
     wandb.init(
-        # project="scnn",
-        # entity="sunway",
-        project="hello_code",
-        entity="leif-liu",
+        project="scnn",
+        entity="sunway",
+        # project="hello_code",
+        # entity="leif-liu",
     )
     wandb.config.update(args)
 
