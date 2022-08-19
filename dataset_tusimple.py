@@ -22,9 +22,9 @@ class Tusimple(Dataset):
         self.args = args
         self.mode = mode
         self.load_data()
-        
+
     def load_data(self):
-        label_file = os.path.join("label", "{}.dat".format(self.mode))
+        label_file = os.path.join("label", "tusimple_{}.dat".format(self.mode))
         with open(label_file, "rb") as f:
             self.label_data = pickle.load(f)
 
@@ -52,7 +52,7 @@ class Tusimple(Dataset):
         label = label[:, :, 0]
         label = util.resize(label, (config.IMAGE_W, config.IMAGE_H))
         label = torch.from_numpy(label).type(torch.long)
-            
+
         sample = {
             "img": img,
             "label": label,

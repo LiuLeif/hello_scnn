@@ -21,16 +21,15 @@ device = torch.device("cuda:0")
 
 
 def train():
-    if args.dataset == "tusimple_culane":
-        train_dataset_tusimple = Tusimple(args, "train")
-        train_dataset_culane = Culane(args, "train")
-        train_dataset = ConcatDataset([train_dataset_tusimple, train_dataset_culane])
+    if args.dataset == "culane":
+        train_dataset = Culane(args, "train")
+        test_dataset = Culane(args, "test")
 
     if args.dataset == "tusimple":
         train_dataset = Tusimple(args, "train")
+        test_dataset = Tusimple(args, "test")
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-    test_dataset = Tusimple(args, "test")
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
 
     net = None

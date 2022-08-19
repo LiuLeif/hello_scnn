@@ -89,11 +89,11 @@ def generate_label_tusimple(flist, mode):
                 )
                 output.append((image, label_image_file, exist))
 
-    with open(os.path.join("label", f"{mode}.dat"), "wb") as f:
+    with open(os.path.join("label", f"tusimple_{mode}.dat"), "wb") as f:
         pickle.dump(output, f)
 
 
-def generate_label_culane(flist, mode):
+def generate_label_culane(flist):
     output = []
 
     for x in flist:
@@ -117,8 +117,12 @@ def generate_label_culane(flist, mode):
 
                 output.append((image, label_image_file, exist))
 
-    with open(os.path.join("label", f"culane_{mode}.dat"), "wb") as f:
-        pickle.dump(output, f)
+    np.random.shuffle(output)
+    part = int(0.7 * len(output))
+    with open(os.path.join("label", f"culane_train.dat"), "wb") as f:
+        pickle.dump(output[:part], f)
+    with open(os.path.join("label", f"culane_test.dat"), "wb") as f:
+        pickle.dump(output[part:], f)
 
 
 if __name__ == "__main__":
@@ -128,7 +132,6 @@ if __name__ == "__main__":
 
     generate_label_culane(
         ("train.txt",),
-        "train",
     )
 
     generate_label_tusimple(

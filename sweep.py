@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 # 2022-08-18 21:26
 def apply_training_config(parser):
-    parser.add_argument(
-        "--dataset", choices=["tusimple_culane", "tusimple"], default="tusimple_culane"
-    )
+    parser.add_argument("--dataset", choices=["culane", "tusimple"], default="tusimple")
     parser.add_argument("--epoch", type=int, default=30)
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--learning_rate", type=float, default=0.001)
