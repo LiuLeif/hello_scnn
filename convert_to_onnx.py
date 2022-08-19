@@ -11,16 +11,16 @@ from scnn_vgg import SCNNVgg
 from scnn_mobilenet import SCNNMobileNet
 
 import config
+import sweep
 
-
-def convert(args):
+def convert():
     net = None
     if args.model == "vgg":
         print("load vgg model")
-        net = SCNNVgg(pretrained=True)
+        net = SCNNVgg(args, pretrained=True)
     if args.model == "mobilenet":
         print("load mobilenet model")
-        net = SCNNMobileNet(pretrained=True)
+        net = SCNNMobileNet(args, pretrained=True)
 
     save_dict = torch.load(net.get_model_name())
     net.load_state_dict(save_dict["net"])
@@ -47,5 +47,6 @@ def convert(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", choices=["vgg", "mobilenet"], default="mobilenet")
+    sweep.apply_model_config(parser)
     args = parser.parse_args()
-    convert(args)
+    convert()
